@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 47% 99%;
+  --foreground: 224 71% 4%;
+  --muted: 220 20% 96%;
+  --muted-foreground: 220 9% 40%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 71% 4%;
+  --border: 220 14% 90%;
+  --ring: 250 95% 65%;
+  --primary: 250 95% 65%;
+  --primary-foreground: 0 0% 100%;
+}
+
+.dark {
+  --background: 226 47% 4%;
+  --foreground: 210 40% 98%;
+  --muted: 222 34% 11%;
+  --muted-foreground: 217 11% 66%;
+  --card: 223 47% 8%;
+  --card-foreground: 210 40% 98%;
+  --border: 223 22% 18%;
+  --ring: 252 100% 73%;
+  --primary: 252 100% 73%;
+  --primary-foreground: 226 47% 4%;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))] antialiased;
+  background-image:
+    radial-gradient(circle at 10% 10%, hsl(var(--primary) / 0.18), transparent 40%),
+    radial-gradient(circle at 90% 20%, hsl(190 100% 60% / 0.14), transparent 30%),
+    radial-gradient(circle at 50% 80%, hsl(320 85% 65% / 0.1), transparent 40%);
+}
+
+::selection {
+  background: hsl(var(--primary) / 0.35);
+}
+
+.glass {
+  @apply bg-[hsl(var(--card)/0.68)] backdrop-blur-xl border border-[hsl(var(--border)/0.7)] shadow-[0_20px_70px_-25px_rgba(99,102,241,0.45)];
+}
+
+.grid-lines {
+  background-image: linear-gradient(hsl(var(--border) / 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.4) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(circle at center, black, transparent 75%);
+}
