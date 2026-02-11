@@ -17,9 +17,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cinematic Developer Portfolio",
+  title: "Jagadeesh Bodavula",
   description:
-    "High-end software engineer portfolio experience built with Next.js, Tailwind, and Framer Motion.",
+    "Presenting Me",
 };
 
 export default function RootLayout({
