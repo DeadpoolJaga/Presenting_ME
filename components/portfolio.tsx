@@ -16,6 +16,64 @@ const fadeInUp = {
 export function PortfolioPage() {
   const [activeProject, setActiveProject] = useState<(typeof projects)[number] | null>(null);
   const reducedMotion = useReducedMotion();
+  const [contact, setContact] = useState({ name: "", email: "", message: "" });
+  const [contactStatus, setContactStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [contactError, setContactError] = useState<string>("");
+
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const submitContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContactError("");
+
+    if (contact.name.trim().length < 2) {
+      setContactError("Please enter your name.");
+      return;
+    }
+    if (!isValidEmail(contact.email.trim())) {
+      setContactError("Please enter a valid email address.");
+      return;
+    }
+    if (contact.message.trim().length < 10) {
+      setContactError("Please enter a message (at least 10 characters).");
+      return;
+    }
+
+    try {
+      setContactStatus("sending");
+
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contact),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.ok) {
+        setContactStatus("error");
+        setContactError("Failed to send. Please try again.");
+        return;
+      }
+
+      setContactStatus("sent");
+      setContact({ name: "", email: "", message: "" });
+    } catch {
+      setContactStatus("error");
+      setContactError("Failed to send. Please try again.");
+    }
+  };
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.scrollIntoView({
+      behavior: reducedMotion ? 'auto' : 'smooth',
+      block: 'start'
+    });
+  };
 
   return (
     <main className="relative overflow-hidden">
@@ -28,17 +86,24 @@ export function PortfolioPage() {
           transition={{ staggerChildren: 0.1 }}
         >
           <motion.p variants={fadeInUp} className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))]">
-            <Sparkles className="h-4 w-4 text-[hsl(var(--primary))]" /> crafting high-leverage digital products
+            <Sparkles className="h-4 w-4 text-[hsl(var(--primary))]" /> crafting high-leverage systems and services
           </motion.p>
           <motion.h1 variants={fadeInUp} className="max-w-4xl text-5xl font-semibold tracking-tight md:text-7xl">
-            Software engineer building <span className="text-[hsl(var(--primary))]">cinematic interfaces</span> for ambitious teams.
+            <span className="text-[hsl(var(--primary))]">Software Engineer</span> with curiosity and Innovation.
           </motion.h1>
           <motion.p variants={fadeInUp} className="max-w-2xl text-lg leading-relaxed text-[hsl(var(--muted-foreground))]">
-            I design and ship premium web experiences that blend product strategy, systems thinking, and pixel-level craft.
+            I design and develop large scale distributed services that blend product strategy, systems thinking with production-grade reliability.
           </motion.p>
           <motion.div variants={fadeInUp} className="flex flex-wrap gap-3">
-            <Button size="lg">View Projects <ArrowRight className="ml-2 h-4 w-4" /></Button>
-            <Button size="lg" variant="ghost">Let&apos;s Collaborate</Button>
+            <Button size="lg" onClick={() => scrollToSection('projects')}>
+              View Projects <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <a href="https://drive.google.com/file/d/1n00AngZMbjkrd5-yiY1bItfPGPuXCHZs/view?usp=drive_link" target="_blank" rel="noopener noreferrer">
+              <Button size="lg" variant="ghost">
+                View Resume
+              </Button>
+            </a>
+
           </motion.div>
         </motion.div>
       </section>
@@ -53,13 +118,13 @@ export function PortfolioPage() {
           className="glass rounded-3xl p-8"
         >
           <p className="text-pretty text-lg leading-relaxed text-[hsl(var(--muted-foreground))]">
-            I&apos;m a frontend architect who thrives at the intersection of engineering, storytelling, and product design. My focus is
-            crafting software that feels effortless, scales responsibly, and leaves a strong emotional impression on users.
+            I am Jagadeesh Bodavula, a full-stack developer who enjoys building scalable, reliable systems and turning complex workflows into simple, observable, and resilient platforms. My focus is
+            crafting software that feels effortless, scales responsibly, and leaves a strong emotional impression on users. I work at the intersection of Full Stack, Cloud and Gen AI.
           </p>
         </motion.div>
       </Section>
 
-      <Section id="skills" title="Skills" subtitle="Toolkit for building premium products">
+      <Section id="skills" title="Skills" subtitle="Toolkit for building resilient systems">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {skills.map((skill, index) => (
             <motion.article
@@ -130,23 +195,52 @@ export function PortfolioPage() {
 
       <Section id="contact" title="Contact" subtitle="Let’s build your next unfair advantage">
         <motion.form
+          onSubmit={submitContact}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           className="glass grid gap-4 rounded-3xl p-8"
         >
           <div className="grid gap-4 md:grid-cols-2">
-            <input className="rounded-xl border border-[hsl(var(--border))] bg-transparent px-4 py-3 outline-none transition focus:ring-2 focus:ring-[hsl(var(--ring))]" placeholder="Your name" />
-            <input className="rounded-xl border border-[hsl(var(--border))] bg-transparent px-4 py-3 outline-none transition focus:ring-2 focus:ring-[hsl(var(--ring))]" placeholder="Your email" type="email" />
+            <input
+              className="rounded-xl border border-[hsl(var(--border))] bg-transparent px-4 py-3 outline-none transition focus:ring-2 focus:ring-[hsl(var(--ring))]"
+              placeholder="Your name"
+              value={contact.name}
+              onChange={(e) => setContact((p) => ({ ...p, name: e.target.value }))}
+            />
+            <input
+              className="rounded-xl border border-[hsl(var(--border))] bg-transparent px-4 py-3 outline-none transition focus:ring-2 focus:ring-[hsl(var(--ring))]"
+              placeholder="Your email"
+              type="email"
+              value={contact.email}
+              onChange={(e) => setContact((p) => ({ ...p, email: e.target.value }))}
+            />
           </div>
-          <textarea className="min-h-32 rounded-xl border border-[hsl(var(--border))] bg-transparent px-4 py-3 outline-none transition focus:ring-2 focus:ring-[hsl(var(--ring))]" placeholder="Tell me about your project" />
+
+          <textarea
+            className="min-h-32 rounded-xl border border-[hsl(var(--border))] bg-transparent px-4 py-3 outline-none transition focus:ring-2 focus:ring-[hsl(var(--ring))]"
+            placeholder="Tell me about your project"
+            value={contact.message}
+            onChange={(e) => setContact((p) => ({ ...p, message: e.target.value }))}
+          />
+
+          {contactError ? (
+            <p className="text-sm text-red-400">{contactError}</p>
+          ) : contactStatus === "sent" ? (
+            <p className="text-sm text-green-400">Message sent — I’ll get back to you soon.</p>
+          ) : null}
+
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3 text-[hsl(var(--muted-foreground))]">
-              <a href="#" className="hover:text-[hsl(var(--foreground))]"><Github className="h-5 w-5" /></a>
-              <a href="#" className="hover:text-[hsl(var(--foreground))]"><Linkedin className="h-5 w-5" /></a>
-              <a href="mailto:hello@example.com" className="hover:text-[hsl(var(--foreground))]"><Mail className="h-5 w-5" /></a>
+              <a href="https://github.com/DeadpoolJaga" className="hover:text-[hsl(var(--foreground))]"><Github className="h-5 w-5" /></a>
+              <a href="https://www.linkedin.com/in/jagadeesh-bodavula/" className="hover:text-[hsl(var(--foreground))]"><Linkedin className="h-5 w-5" /></a>
+              <a href="mailto:bodavulajagadeesh@gmail.com" className="hover:text-[hsl(var(--foreground))]"><Mail className="h-5 w-5" /></a>
             </div>
-            <Button type="submit">Send Message <Code2 className="ml-2 h-4 w-4" /></Button>
+
+            <Button type="submit" disabled={contactStatus === "sending"}>
+              {contactStatus === "sending" ? "Sending..." : "Send Message"}
+              <Code2 className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </motion.form>
       </Section>
